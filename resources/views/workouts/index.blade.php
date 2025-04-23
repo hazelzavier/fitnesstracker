@@ -43,9 +43,15 @@
                     </div>
                 </div>
             </div>
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-700">Progress Overview</h3>
+                <a href="{{ route('workouts.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Add New Workout
+                </a>
+            </div>
 
             <div class="bg-white p-6 rounded-lg shadow-sm">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Progress Overview</h3>
+                
                 {{--  Stats Component replacement  --}}
                 @if ($workouts->isNotEmpty())
                     @foreach ($exercises as $exercise)
