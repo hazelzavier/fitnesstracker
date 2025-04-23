@@ -2,10 +2,11 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WorkoutController;
-use App\Http\Controllers\ExerciseController; // Add this line
+use App\Http\Controllers\ExerciseController;
 use Illuminate\Support\Facades\Route;
 
-// Protected routes (require authentication)
+
+
 Route::middleware('auth')->group(function () {
     Route::get('/', [WorkoutController::class, 'index'])->name('home');
 

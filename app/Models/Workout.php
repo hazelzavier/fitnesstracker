@@ -9,27 +9,15 @@ class Workout extends Model
 {
     use HasFactory;
 
-    /**
-     * Mass assignable attributes.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'exercise',    // Name of the exercise
-        'weight',      // Weight used in the exercise
-        'repetitions', // Number of repetitions
-        'date',        // Date of the workout
-        'user_id',     // Foreign key for the user who performed the workout
+        'name', // Make sure 'name' is in this array
+        'date',
+        'user_id',
     ];
 
-    /**
-     * Define the relationship between Workout and User.
-     * Each workout belongs to a specific user.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function user()
+    public function exercises()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsToMany(Exercise::class, 'workout_exercise')
+                    ->withPivot('weight', 'reps', 'sets');
     }
 }

@@ -6,7 +6,7 @@ use App\Models\Workout;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\Exercise; // Add this line
+use App\Models\Exercise;
 
 class WorkoutController extends Controller
 {
@@ -14,14 +14,14 @@ class WorkoutController extends Controller
     public function index()
     {
         $workouts = Workout::where('user_id', Auth::id())->orderBy('date', 'desc')->get();
-        $exercises = Exercise::all(); // Fetch all exercises
-        return view('workouts.index', compact('workouts', 'exercises')); // Pass $exercises to the view
+        $exercises = Exercise::all();
+        return view('workouts.index', compact('workouts', 'exercises'));
     }
 
     // Show the form to create a new workout
     public function create()
     {
-        $exercises = Exercise::all(); // Fetch all exercises to populate the dropdown
+        $exercises = Exercise::all();
         return view('workouts.create', compact('exercises'));
     }
 
@@ -54,7 +54,7 @@ class WorkoutController extends Controller
             // Attach the exercises to the workout with the pivot data (weight, reps, sets)
             $exerciseData = [];
             foreach ($request->exercise_name as $key => $exerciseName) {
-                 // Check if the exercise name exists, if not create a new exercise
+                // Check if the exercise name exists, if not create a new exercise
                 $exercise = Exercise::firstOrCreate(['name' => $exerciseName]);
                 $exerciseData[$exercise->id] = [
                     'weight' => $request->weight[$key],
@@ -65,8 +65,8 @@ class WorkoutController extends Controller
             $workout->exercises()->attach($exerciseData);
         });
 
-        // Redirect the user back to the workouts index page (which is your dashboard) with a success message
-        return redirect()->route('home')->with('success', 'Workout added successfully!'); // Changed route
+        // Redirect the user back to the home page with a success message
+        return redirect()->route('home')->with('success', 'Workout added successfully!');
     }
 
     // Show the form to edit a specific workout
@@ -88,11 +88,11 @@ class WorkoutController extends Controller
         }
 
         // Validate the incoming request
-        $request->validate([
+         $request->validate([
             'name' => 'required|string|max:255',
             'date' => 'required|date|before_or_equal:today',
-             'exercise_id' => 'required|array',
-            'exercise_id.*' => 'exists:exercises,id', // Validate each exercise ID
+            'exercise_id' => 'required|array',
+            'exercise_id.*' => 'exists:exercises,id', 
             'weight' => 'required|array',
             'weight.*' => 'numeric|min:0',
             'reps' => 'required|array',
@@ -108,8 +108,8 @@ class WorkoutController extends Controller
                 'date' => $request->date,
             ]);
 
-             $exerciseData = [];
-             foreach ($request->exercise_id as $key => $exerciseId) {
+            $exerciseData = [];
+            foreach ($request->exercise_id as $key => $exerciseId) {
                 $exerciseData[$exerciseId] = [
                     'weight' => $request->weight[$key],
                     'reps' => $request->reps[$key],
