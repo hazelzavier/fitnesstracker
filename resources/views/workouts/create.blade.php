@@ -1,37 +1,78 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container mx-auto mt-8">
-        <h2 class="text-2xl font-semibold mb-4">Add New Clothing</h2>
+<div class="container mx-auto p-6">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Add New Workout</h2>
+    <form method="POST" action="{{ route('workouts.store') }}" class="bg-white shadow-md rounded-md p-6 space-y-4">
+        @csrf
+        <div>
+            <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Workout Name:</label>
+            <input type="text" name="name" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+        </div>
+        <div>
+            <label for="date" class="block text-gray-700 text-sm font-bold mb-2">Date:</label>
+            <input type="date" name="date" id="date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+        </div>
 
-        <form action="{{ route('clothing.store') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-
-            <div class="mb-4">
-                <label for="category_id" class="block text-sm font-medium text-gray-700">Category</label>
-                <select name="category_id" id="category_id" class="w-full p-2 mt-2 border border-gray-300 rounded-md">
-                    @foreach($categories as $category)
-                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                    @endforeach
-                </select>
+        <div id="exercise-fields">
+            <div class="exercise-field mt-4 p-4 border rounded-md">
+                 <label for="exercise_name" class="block text-gray-700 text-sm font-bold mb-2">Exercise Name:</label>
+                    <input type="text" name="exercise_name[]"  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    
+                <label for="weight" class="block text-gray-700 text-sm font-bold mb-2">Weight (kg):</label>
+                <input type="number" name="weight[]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                <label for="reps" class="block text-gray-700 text-sm font-bold mb-2">Repetitions:</label>
+                <input type="number" name="reps[]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                <label for="sets" class="block text-gray-700 text-sm font-bold mb-2">Sets:</label>
+                <input type="number" name="sets[]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                <button type="button" class="add-exercise-field bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded text-xs focus:outline-none focus:shadow-outline mt-2">Add Exercise</button>
+                <button type="button" class="remove-exercise-field bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-xs focus:outline-none focus:shadow-outline mt-2">Remove Exercise</button>
             </div>
+        </div>
 
-            <div class="mb-4">
-                <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-                <input type="text" name="name" id="name" class="w-full p-2 mt-2 border border-gray-300 rounded-md" required>
-            </div>
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            Save Workout
+        </button>
+    </form>
+</div>
 
-            <div class="mb-4">
-                <label for="color" class="block text-sm font-medium text-gray-700">Color</label>
-                <input type="text" name="color" id="color" class="w-full p-2 mt-2 border border-gray-300 rounded-md" required>
-            </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addExerciseFieldButton = document.querySelector('.add-exercise-field');
+        const exerciseFieldsContainer = document.getElementById('exercise-fields');
 
-            <div class="mb-4">
-                <label for="image" class="block text-sm font-medium text-gray-700">Image</label>
-                <input type="file" name="image" id="image" class="w-full p-2 mt-2 border border-gray-300 rounded-md" required>
-            </div>
+        if (addExerciseFieldButton && exerciseFieldsContainer) {
+            addExerciseFieldButton.addEventListener('click', function () {
+                const newExerciseField = document.createElement('div');
+                newExerciseField.className = 'exercise-field mt-4 p-4 border rounded-md';
+                newExerciseField.innerHTML = `
+                     <label for="exercise_name" class="block text-gray-700 text-sm font-bold mb-2">Exercise Name:</label>
+                    <input type="text" name="exercise_name[]"  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    <label for="weight" class="block text-gray-700 text-sm font-bold mb-2">Weight (kg):</label>
+                    <input type="number" name="weight[]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    <label for="reps" class="block text-gray-700 text-sm font-bold mb-2">Repetitions:</label>
+                    <input type="number" name="reps[]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    <label for="sets" class="block text-gray-700 text-sm font-bold mb-2">Sets:</label>
+                    <input type="number" name="sets[]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    <button type="button" class="remove-exercise-field bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-xs focus:outline-none focus:shadow-outline mt-2">Remove Exercise</button>
+                `;
+                exerciseFieldsContainer.appendChild(newExerciseField);
 
-            <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded-md">Add Clothing</button>
-        </form>
-    </div>
+                const removeButton = newExerciseField.querySelector('.remove-exercise-field');
+                removeButton.addEventListener('click', function () {
+                    newExerciseField.remove();
+                });
+            });
+        }
+
+        exerciseFieldsContainer.addEventListener('click', function (event) {
+            if (event.target.classList.contains('remove-exercise-field')) {
+                const exerciseField = event.target.closest('.exercise-field');
+                if (exerciseField) {
+                    exerciseField.remove();
+                }
+            }
+        });
+    });
+</script>
 @endsection
