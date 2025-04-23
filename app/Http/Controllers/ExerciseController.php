@@ -42,6 +42,10 @@ class ExerciseController extends Controller
     // Show the form for editing the specified exercise.
     public function edit(Exercise $exercise)
     {
+        // Controleer of de gebruiker de eigenaar is van de oefening
+        if ($exercise->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
         return view('exercises.edit', compact('exercise'));
     }
 

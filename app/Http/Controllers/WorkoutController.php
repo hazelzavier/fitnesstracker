@@ -11,7 +11,7 @@ use App\Models\Exercise;
 class WorkoutController extends Controller
 {
     /**
-     * Display the workouts for the logged-in user.
+     * Display a listing of the workouts.
      *
      * @return \Illuminate\Http\Response
      */
@@ -46,7 +46,7 @@ class WorkoutController extends Controller
             'name' => 'required|string|max:255',
             'date' => 'required|date|before_or_equal:today',
             'exercise_name' => 'required|array',
-            'exercise_name.*' => 'string|max:255',
+            'exercise_name.*' => 'required|string|max:255', // Corrected line
             'weight' => 'required|array',
             'weight.*' => 'numeric|min:0',
             'reps' => 'required|array',
@@ -75,6 +75,18 @@ class WorkoutController extends Controller
         });
 
         return redirect()->route('workouts.index')->with('success', 'Workout added successfully!');
+    }
+
+    /**
+     * Display the specified workout.
+     *
+     * @param  \App\Models\Workout  $workout
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Workout $workout)
+    {
+        $workout->load('exercises');
+        return view('workouts.show', compact('workout'));
     }
 
     /**
@@ -109,8 +121,8 @@ class WorkoutController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'date' => 'required|date|before_or_equal:today',
-            'exercise_id' => 'required|array',
-            'exercise_id.*' => 'exists:exercises,id',
+            'exercise_name' => 'required|array',
+            'exercise_name.*' => 'required|string|max:255', // Corrected line
             'weight' => 'required|array',
             'weight.*' => 'numeric|min:0',
             'reps' => 'required|array',
@@ -120,14 +132,18 @@ class WorkoutController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $workout) {
+            // Update the workout
             $workout->update([
                 'name' => $request->name,
                 'date' => $request->date,
             ]);
 
+            // Sync the exercises
             $exerciseData = [];
-            foreach ($request->exercise_id as $key => $exerciseId) {
-                $exerciseData[$exerciseId] = [
+            foreach ($request->exercise_name as $key => $exerciseName) {
+                // Check if the exercise name exists, if not create a new exercise
+                $exercise = Exercise::firstOrCreate(['name' => $exerciseName]);
+                $exerciseData[$exercise->id] = [
                     'weight' => $request->weight[$key],
                     'reps' => $request->reps[$key],
                     'sets' => $request->sets[$key],
@@ -156,3 +172,4 @@ class WorkoutController extends Controller
         return redirect()->route('workouts.index')->with('success', 'Workout deleted successfully!');
     }
 }
+

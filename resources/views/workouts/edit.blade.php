@@ -1,64 +1,96 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto mt-10">
-    <div class="flex justify-center">
-        <div class="flex flex-col items-center w-full sm:w-4/5 lg:w-3/5">
-            <h3 class="text-2xl font-semibold mb-4">Edit Clothing</h3>
+    <div class="container mx-auto p-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Edit Workout</h2>
 
-            <!-- Edit Form -->
-            <form action="{{ route('clothing.update', $clothing) }}" method="POST" enctype="multipart/form-data" class="w-full sm:w-3/4 lg:w-1/2">
-                @csrf
-                @method('PUT')
+        <form method="POST" action="{{ route('workouts.update', $workout->id) }}" class="bg-white shadow-md rounded-md p-6 space-y-4">
+            @csrf
+            @method('PUT') {{--  method directive voor Laravel om aan te geven dat dit een update request is  --}}
 
-                <!-- Category Selection -->
-                <div class="mb-4">
-                    <label for="category_id" class="block text-sm font-medium text-gray-700">Category</label>
-                    <select name="category_id" id="category_id" class="w-full p-2 mt-1 border border-gray-300 rounded-md">
-                        @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{ $category->id == $clothing->category_id ? 'selected' : '' }}>
-                                {{ $category->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('category_id')
-                        <div class="text-red-500 text-sm">{{ $message }}</div>
-                    @enderror
-                </div>
+            <div>
+                <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Workout Name:</label>
+                <input type="text" name="name" id="name" value="{{ $workout->name }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                @error('name')
+                    <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                @enderror
+            </div>
 
-                <!-- Name Input -->
-                <div class="mb-4">
-                    <label for="name" class="block text-sm font-medium text-gray-700">Clothing Name</label>
-                    <input type="text" name="name" id="name" value="{{ old('name', $clothing->name) }}" class="w-full p-2 mt-1 border border-gray-300 rounded-md">
-                    @error('name')
-                        <div class="text-red-500 text-sm">{{ $message }}</div>
-                    @enderror
-                </div>
+            <div>
+                <label for="date" class="block text-gray-700 text-sm font-bold mb-2">Date:</label>
+                <input type="date" name="date" id="date" value="{{ $workout->date }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                 @error('date')
+                    <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                @enderror
+            </div>
 
-                <!-- Color Input -->
-                <div class="mb-4">
-                    <label for="color" class="block text-sm font-medium text-gray-700">Color</label>
-                    <input type="text" name="color" id="color" value="{{ old('color', $clothing->color) }}" class="w-full p-2 mt-1 border border-gray-300 rounded-md">
-                    @error('color')
-                        <div class="text-red-500 text-sm">{{ $message }}</div>
-                    @enderror
-                </div>
+            <div id="exercise-fields">
+                @foreach ($workout->exercises as $exercise)
+                    <div class="exercise-field mt-4 p-4 border rounded-md">
+                        <label for="exercise_name" class="block text-gray-700 text-sm font-bold mb-2">Exercise Name:</label>
+                         <input type="text" name="exercise_name[]" value="{{ $exercise->name }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
 
-                <!-- Image Input -->
-                <div class="mb-4">
-                    <label for="image" class="block text-sm font-medium text-gray-700">Clothing Image</label>
-                    <input type="file" name="image" id="image" class="w-full p-2 mt-1 border border-gray-300 rounded-md">
-                    @error('image')
-                        <div class="text-red-500 text-sm">{{ $message }}</div>
-                    @enderror
-                </div>
+                        <label for="weight" class="block text-gray-700 text-sm font-bold mb-2">Weight (kg):</label>
+                        <input type="number" name="weight[]" value="{{ $exercise->pivot->weight }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
 
-                <!-- Submit Button -->
-                <div class="flex justify-center">
-                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Save Changes</button>
-                </div>
-            </form>
-        </div>
+                        <label for="reps" class="block text-gray-700 text-sm font-bold mb-2">Repetitions:</label>
+                        <input type="number" name="reps[]" value="{{ $exercise->pivot->reps }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+
+                        <label for="sets" class="block text-gray-700 text-sm font-bold mb-2">Sets:</label>
+                        <input type="number" name="sets[]" value="{{ $exercise->pivot->sets }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+
+                        <button type="button" class="add-exercise-field bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded text-xs focus:outline-none focus:shadow-outline mt-2">Add Exercise</button>
+                        <button type="button" class="remove-exercise-field bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-xs focus:outline-none focus:shadow-outline mt-2">Remove Exercise</button>
+                    </div>
+                @endforeach
+            </div>
+
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Update Workout
+            </button>
+             <a href="{{ route('workouts.index') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Cancel
+            </a>
+        </form>
     </div>
-</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const addExerciseFieldButton = document.querySelector('.add-exercise-field');
+            const exerciseFieldsContainer = document.getElementById('exercise-fields');
+
+            if (addExerciseFieldButton && exerciseFieldsContainer) {
+                addExerciseFieldButton.addEventListener('click', function () {
+                    const newExerciseField = document.createElement('div');
+                    newExerciseField.className = 'exercise-field mt-4 p-4 border rounded-md';
+                    newExerciseField.innerHTML = `
+                            <label for="exercise_name" class="block text-gray-700 text-sm font-bold mb-2">Exercise Name:</label>
+                            <input type="text" name="exercise_name[]"  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                            <label for="weight" class="block text-gray-700 text-sm font-bold mb-2">Weight (kg):</label>
+                            <input type="number" name="weight[]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                            <label for="reps" class="block text-gray-700 text-sm font-bold mb-2">Repetitions:</label>
+                            <input type="number" name="reps[]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                            <label for="sets" class="block text-gray-700 text-sm font-bold mb-2">Sets:</label>
+                            <input type="number" name="sets[]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                            <button type="button" class="remove-exercise-field bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-xs focus:outline-none focus:shadow-outline mt-2">Remove Exercise</button>
+                        `;
+                    exerciseFieldsContainer.appendChild(newExerciseField);
+
+                    const removeButton = newExerciseField.querySelector('.remove-exercise-field');
+                    removeButton.addEventListener('click', function () {
+                        newExerciseField.remove();
+                    });
+                });
+            }
+
+             exerciseFieldsContainer.addEventListener('click', function (event) {
+                if (event.target.classList.contains('remove-exercise-field')) {
+                    const exerciseField = event.target.closest('.exercise-field');
+                    if (exerciseField) {
+                        exerciseField.remove();
+                    }
+                }
+            });
+        });
+    </script>
 @endsection

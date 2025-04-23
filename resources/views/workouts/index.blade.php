@@ -44,10 +44,15 @@
                 </div>
             </div>
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-gray-700">Progress Overview</h3>
-                <a href="{{ route('workouts.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                    Add New Workout
-                </a>
+                <h3 class="text-lg font-semibold text-gray-700">Voortgangsoverzicht</h3>
+                <div class="space-x-2">
+                    <a href="{{ route('workouts.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        Add Workout
+                    </a>
+                    <a href="{{ route('exercises.index') }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        Oefeningen beheren
+                    </a>
+                </div>
             </div>
 
             <div class="bg-white p-6 rounded-lg shadow-sm">
