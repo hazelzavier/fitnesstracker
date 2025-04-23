@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Exercise;
+use Carbon\Carbon;
 
 class WorkoutController extends Controller
 {
@@ -46,7 +47,7 @@ class WorkoutController extends Controller
             'name' => 'required|string|max:255',
             'date' => 'required|date|before_or_equal:today',
             'exercise_name' => 'required|array',
-            'exercise_name.*' => 'required|string|max:255', // Corrected line
+            'exercise_name.*' => 'required|string|max:255',
             'weight' => 'required|array',
             'weight.*' => 'numeric|min:0',
             'reps' => 'required|array',
@@ -58,7 +59,7 @@ class WorkoutController extends Controller
         DB::transaction(function () use ($request) {
             $workout = Workout::create([
                 'name' => $request->name,
-                'date' => $request->date,
+                'date' => Carbon::parse($request->date)->format('Y-m-d'), // Correcte notatie afdwingen
                 'user_id' => Auth::id(),
             ]);
 
@@ -122,7 +123,7 @@ class WorkoutController extends Controller
             'name' => 'required|string|max:255',
             'date' => 'required|date|before_or_equal:today',
             'exercise_name' => 'required|array',
-            'exercise_name.*' => 'required|string|max:255', // Corrected line
+            'exercise_name.*' => 'required|string|max:255',
             'weight' => 'required|array',
             'weight.*' => 'numeric|min:0',
             'reps' => 'required|array',
@@ -135,7 +136,7 @@ class WorkoutController extends Controller
             // Update the workout
             $workout->update([
                 'name' => $request->name,
-                'date' => $request->date,
+                'date' => Carbon::parse($request->date)->format('Y-m-d'), // Correcte notatie afdwingen
             ]);
 
             // Sync the exercises
