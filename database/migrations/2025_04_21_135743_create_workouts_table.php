@@ -9,15 +9,19 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::create('workouts', function (Blueprint $table) {
-            $table->id();
-            $table->date('date');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
-        });
-    }
+    public function up()
+{
+    Schema::create('workouts', function (Blueprint $table) {
+        $table->id();
+        $table->string('name'); // Voeg deze regel toe als deze ontbreekt
+        $table->date('date');
+        $table->unsignedBigInteger('user_id');
+        $table->timestamps();
+
+        $table->foreign('user_id')->references('id')->on('users'); //Als je een user_id hebt
+    });
+}
+
 
     /**
      * Reverse the migrations.

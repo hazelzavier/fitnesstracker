@@ -37,7 +37,7 @@
                         <div>
                             <p class="text-sm text-gray-500">Last Workout</p>
                             <p class="text-2xl font-bold text-gray-800">
-                                {{ $lastWorkout ? $lastWorkout->date->format('d-m-Y') : 'No workouts' }}
+                                 {{ $lastWorkout ? ($lastWorkout->date instanceof \Carbon\Carbon ? $lastWorkout->date->format('d-m-Y') : \Carbon\Carbon::parse($lastWorkout->date)->format('d-m-Y'))  : 'No workouts' }}
                             </p>
                         </div>
                     </div>
@@ -52,16 +52,16 @@
                         <div class="mb-6">
                             <div class="flex justify-between items-center mb-2">
                                 <h4 class="font-medium text-gray-800">{{ $exercise->name }}</h4>
-                                 <span class="text-sm text-gray-500">{{ $workouts->where('exercise_id', $exercise->id)->count() }} workouts</span>
+                                <span class="text-sm text-gray-500">{{ $workouts->where('exercises.name', $exercise->name)->count() }} workouts</span>
                             </div>
                             <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                {{--  TODO:  calculate progress  --}}
+                                 {{--  TODO:  calculate progress  --}}
                                 <div class="h-full bg-green-500" style="width: 50%"></div>
                             </div>
                             <div class="flex justify-between mt-1 text-sm">
                                 <span class="text-gray-600">Started: 100 kg</span>
                                 <span class="font-medium text-green-600">+10 kg (+10%)</span>
-                                 <span class="text-gray-600">Current: 110 kg</span>
+                                <span class="text-gray-600">Current: 110 kg</span>
                             </div>
                         </div>
                     @endforeach
