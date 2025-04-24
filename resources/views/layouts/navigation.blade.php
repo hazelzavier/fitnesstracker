@@ -4,11 +4,18 @@
         <div class="flex justify-between h-16">
             <div class="flex items-center">
                 <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('home') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
+                                <!-- Logo / App Name Section -->
+                <div class="flex-shrink-0 flex items-center">
+                    {{-- Link naar home/dashboard --}}
+                    <a href="{{ route('home') }}" class="flex items-center space-x-2 text-gray-800 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-400 transition duration-150 ease-in-out">
+                        {{-- Barbell Icon (Font Awesome) --}}
+                        <i class="fas fa-dumbbell text-xl"></i> {{-- Pas grootte (text-xl) aan indien nodig --}}
+
+                        {{-- App Name --}}
+                        <span class="font-semibold text-lg">FitnessTracker</span> {{-- Pas grootte/dikte aan indien nodig --}}
                     </a>
                 </div>
+
 
                 <!-- Profile Dropdown -->
                 <div class="hidden sm:flex sm:items-center sm:ms-6">
@@ -46,12 +53,7 @@
             </div>
 
             <!-- Navigation Links -->
-            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
-                    {{ __('Homepage') }}
-                </x-nav-link>
-            
-            </div>
+           
 
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
