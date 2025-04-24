@@ -27,7 +27,7 @@
                         <i class="fas fa-dumbbell text-green-600 mr-3 text-lg"></i>
                         <div>
                             <p class="text-sm text-gray-500">Unique Exercises</p>
-                            <p class="text-2xl font-bold text-gray-800">{{ $exercises->count() }}</p>
+                            <p class="text-2xl font-bold text-gray-800">{{ $uniqueExercisesPerformedCount }}</p>
                         </div>
                     </div>
                 </div>
@@ -37,7 +37,7 @@
                         <div>
                             <p class="text-sm text-gray-500">Last Workout</p>
                             <p class="text-2xl font-bold text-gray-800">
-                                 {{ $lastWorkout ? ($lastWorkout->date instanceof \Carbon\Carbon ? $lastWorkout->date->format('d-m-Y') : \Carbon\Carbon::parse($lastWorkout->date)->format('d-m-Y'))  : 'No workouts' }}
+                                {{ $lastWorkout ? ($lastWorkout->date instanceof \Carbon\Carbon ? $lastWorkout->date->format('d-m-Y') : \Carbon\Carbon::parse($lastWorkout->date)->format('d-m-Y'))  : 'No workouts' }}
                             </p>
                         </div>
                     </div>
@@ -56,28 +56,46 @@
             </div>
 
             <div class="bg-white p-6 rounded-lg shadow-sm">
-                
-                {{--  Stats Component replacement  --}}
-                @if ($workouts->isNotEmpty())
-                    @foreach ($exercises as $exercise)
-                        <div class="mb-6">
-                            <div class="flex justify-between items-center mb-2">
-                                <h4 class="font-medium text-gray-800">{{ $exercise->name }}</h4>
-                                <span class="text-sm text-gray-500">{{ $workouts->where('exercises.name', $exercise->name)->count() }} workouts</span>
+
+                @if ($exerciseProgress->isNotEmpty())
+                    <div class="space-y-6">
+                        @foreach ($exerciseProgress as $progress)
+                            <div>
+                                <div class="flex justify-between items-baseline mb-1">
+                                    <h4 class="font-semibold text-lg text-gray-700">{{ $progress->exerciseName }}</h4>
+                                    <span class="text-xs text-gray-500">{{ $progress->performanceCount }} session(s)</span>
+                                </div>
+                                <div class="relative pt-1">
+                                    <div class="overflow-hidden h-3 mb-2 text-xs flex rounded bg-gray-200">
+                                        @php
+                                            // Bepaal progressie percentage (bijv. gebaseerd op gewichtstoename)
+                                            $progressBarWidth = 0;
+                                            if ($progress->performanceCount > 1 && $progress->firstWeight > 0) {
+                                                $progressBarWidth = max(0, min(100, ($progress->weightDiff / $progress->firstWeight) * 100));
+                                            } elseif ($progress->performanceCount > 1 && $progress->weightDiff > 0) {
+                                                $progressBarWidth = 100; // Gestart op 0, nu > 0
+                                            }
+                                        @endphp
+                                        <div style="width:{{ $progressBarWidth }}%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center {{ $progress->weightDiff >= 0 ? 'bg-green-500' : 'bg-red-500' }} transition-all duration-500 ease-out"></div>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center mt-1 text-sm">
+                                    <span class="text-gray-600">Started: <span class="font-medium">{{ number_format($progress->firstWeight, 1) }} kg</span> ({{ \Carbon\Carbon::parse($progress->firstDate)->format('d-m-Y') }})</span>
+                                    @if ($progress->performanceCount > 1)
+                                        <span class="font-medium {{ $progress->weightDiff >= 0 ? 'text-green-600' : 'text-red-600' }}">{{ $progress->weightDiff >= 0 ? '+' : '' }}{{ number_format($progress->weightDiff, 1) }} kg ({{ $progress->weightDiff >= 0 ? '+' : '' }}{{ number_format($progress->percentageChange, 0) }}%)</span>
+                                    @else
+                                        <span class="text-gray-500 italic">First entry</span>
+                                    @endif
+                                    <span class="text-gray-600">Current: <span class="font-medium">{{ number_format($progress->lastWeight, 1) }} kg</span> ({{ \Carbon\Carbon::parse($progress->lastDate)->format('d-m-Y') }})</span>
+                                </div>
                             </div>
-                            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                 {{--  TODO:  calculate progress  --}}
-                                <div class="h-full bg-green-500" style="width: 50%"></div>
-                            </div>
-                            <div class="flex justify-between mt-1 text-sm">
-                                <span class="text-gray-600">Started: 100 kg</span>
-                                <span class="font-medium text-green-600">+10 kg (+10%)</span>
-                                <span class="text-gray-600">Current: 110 kg</span>
-                            </div>
-                        </div>
-                    @endforeach
+                            @if (!$loop->last)
+                                <hr class="border-gray-200 my-4">
+                            @endif
+                        @endforeach
+                    </div>
                 @else
-                    <p class="text-gray-600 mt-4">No workouts have been added yet.</p>
+                    <p class="text-gray-600 mt-4">No progress data available yet. Add more workouts to see your progress!</p>
                 @endif
             </div>
         @endif

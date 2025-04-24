@@ -3,25 +3,96 @@
 namespace App\Http\Controllers;
 
 use App\Models\Workout;
+use App\Models\Exercise;
+use App\Models\WorkoutExercise; // Import WorkoutExercise (was al aanwezig in de tweede code)
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\Exercise;
 use Carbon\Carbon;
 
 class WorkoutController extends Controller
 {
     /**
-     * Display a listing of the workouts.
+     * Display a listing of the workouts and progress overview.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        $workouts = Workout::where('user_id', Auth::id())->orderBy('date', 'desc')->get();
+        $userId = Auth::id();
+
+        // Basis workout data voor de lijstweergave (uit je originele code)
+        $workouts = Workout::where('user_id', $userId)->orderBy('date', 'desc')->get();
         $exercises = Exercise::all();
         $lastWorkout = Workout::with('exercises')->orderBy('date', 'desc')->first();
-        return view('workouts.index', compact('workouts', 'exercises', 'lastWorkout'));
+
+        // --- START: Voortgangsdata verzamelen (uit je tweede code) ---
+        $exerciseProgress = WorkoutExercise::whereHas('workout', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->with(['exercise', 'workout' => function($query) {
+                $query->orderBy('date', 'asc'); // Zorg dat workouts gesorteerd zijn op datum
+            }])
+            ->get()
+            ->groupBy('exercise_id') // Groepeer alle prestaties per oefening
+            ->map(function ($performances, $exerciseId) {
+                // Sorteer de prestaties binnen de groep op datum (via de workout relatie)
+                $sortedPerformances = $performances->sortBy(function($performance) {
+                    return $performance->workout->date;
+                });
+
+                $firstPerformance = $sortedPerformances->first();
+                $lastPerformance = $sortedPerformances->last();
+
+                if (!$firstPerformance) {
+                    return null; // Zou niet moeten gebeuren als gegroepeerd, maar voor de zekerheid
+                }
+
+                $firstWeight = $firstPerformance->weight;
+                $lastWeight = $lastPerformance->weight;
+                $weightDiff = 0;
+                $percentageChange = 0;
+
+                // Bereken alleen verschil als er meer dan één prestatie is
+                if ($sortedPerformances->count() > 1) {
+                    $weightDiff = $lastWeight - $firstWeight;
+                    if ($firstWeight > 0) { // Voorkom delen door nul
+                        $percentageChange = ($weightDiff / $firstWeight) * 100;
+                    } elseif ($lastWeight > 0) {
+                        $percentageChange = 100; // Als gestart op 0 en nu > 0, is het effectief 100% progressie
+                    }
+                }
+
+                return (object) [ // Gebruik een object voor duidelijkere toegang in de view
+                    'exerciseId' => $exerciseId,
+                    'exerciseName' => $firstPerformance->exercise->name, // Naam van de oefening
+                    'performanceCount' => $sortedPerformances->count(), // Aantal keer uitgevoerd
+                    'firstDate' => $firstPerformance->workout->date,
+                    'firstWeight' => $firstWeight,
+                    'lastDate' => $lastPerformance->workout->date,
+                    'lastWeight' => $lastWeight,
+                    'weightDiff' => $weightDiff,
+                    'percentageChange' => $percentageChange,
+                ];
+            })
+            ->filter() // Verwijder eventuele null waarden
+            ->sortByDesc(function($progress) { // Sorteer op laatste datum (nieuwste bovenaan)
+                return $progress->lastDate;
+            });
+        // --- EINDE: Voortgangsdata verzamelen ---
+
+
+        // Haal unieke oefeningen op die de gebruiker heeft gedaan (voor de top card)
+        $uniqueExercisesPerformedCount = $exerciseProgress->count();
+
+
+        return view('workouts.index', compact(
+            'workouts', // Basis workouts lijst
+            'exercises', // Alle oefeningen
+            'lastWorkout', // Laatste workout
+            'exerciseProgress', // Nieuwe data voor voortgang
+            'uniqueExercisesPerformedCount' // Nieuwe data voor top card
+        ));
     }
 
     /**
@@ -173,7 +244,7 @@ class WorkoutController extends Controller
         return redirect()->route('workouts.index')->with('success', 'Workout deleted successfully!');
     }
 
-    public function listHistory() // <-- NIEUWE METHODE
+    public function listHistory() // <-- NIEUWE METHODE (ongewijzigd)
     {
         $workouts = Workout::where('user_id', Auth::id())
                             ->with('exercises') // Eager load exercises for efficiency
@@ -184,4 +255,3 @@ class WorkoutController extends Controller
         return view('workouts.list', compact('workouts'));
     }
 }
-
