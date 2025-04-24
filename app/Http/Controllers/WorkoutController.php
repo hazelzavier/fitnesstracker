@@ -172,5 +172,16 @@ class WorkoutController extends Controller
 
         return redirect()->route('workouts.index')->with('success', 'Workout deleted successfully!');
     }
+
+    public function listHistory() // <-- NIEUWE METHODE
+    {
+        $workouts = Workout::where('user_id', Auth::id())
+                            ->with('exercises') // Eager load exercises for efficiency
+                            ->orderBy('date', 'desc')
+                            ->get();
+
+        // Gebruik de bestaande list view
+        return view('workouts.list', compact('workouts'));
+    }
 }
 
