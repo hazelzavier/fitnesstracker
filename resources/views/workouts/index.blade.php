@@ -156,7 +156,7 @@
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Workouts</p>
                             {{-- Zorg dat $workouts hier correct is, mogelijk $userWorkouts gebruiken? --}}
-                            <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ $userWorkouts->count() }}</p>
+                            <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ $workouts->count() }}</p>
                         </div>
                     </div>
                 </div>
