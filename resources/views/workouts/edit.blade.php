@@ -24,6 +24,17 @@
                 @enderror
             </div>
 
+    
+<div>
+    <label for="notes" class="block text-gray-700 text-sm font-bold mb-2">Notes (Optional):</label>
+    {{-- Gebruik old() voor validatiefouten, anders de bestaande notes --}}
+    <textarea name="notes" id="notes" rows="4" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ old('notes', $workout->notes) }}</textarea>
+    @error('notes')
+        <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+    @enderror
+</div>
+
+
             <div id="exercise-fields">
                 @foreach ($workout->exercises as $exercise)
                     <div class="exercise-field mt-4 p-4 border rounded-md">

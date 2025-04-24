@@ -114,9 +114,15 @@ class WorkoutController extends Controller
      */
     public function store(Request $request)
     {
+
+{
+
+}
+
         $request->validate([
             'name' => 'required|string|max:255',
             'date' => 'required|date|before_or_equal:today',
+            'notes' => 'nullable|string',
             'exercise_name' => 'required|array',
             'exercise_name.*' => 'required|string|max:255',
             'weight' => 'required|array',
@@ -131,6 +137,7 @@ class WorkoutController extends Controller
             $workout = Workout::create([
                 'name' => $request->name,
                 'date' => Carbon::parse($request->date)->format('Y-m-d'), // Correcte notatie afdwingen
+                'notes' => $request->notes,
                 'user_id' => Auth::id(),
             ]);
 
@@ -193,6 +200,7 @@ class WorkoutController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'date' => 'required|date|before_or_equal:today',
+            'notes' => 'nullable|string',
             'exercise_name' => 'required|array',
             'exercise_name.*' => 'required|string|max:255',
             'weight' => 'required|array',
@@ -208,6 +216,7 @@ class WorkoutController extends Controller
             $workout->update([
                 'name' => $request->name,
                 'date' => Carbon::parse($request->date)->format('Y-m-d'), // Correcte notatie afdwingen
+                'notes' => $request->notes,
             ]);
 
             // Sync the exercises

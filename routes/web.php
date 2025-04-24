@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth')->group(function () {
     Route::get('/', [WorkoutController::class, 'index'])->name('home');
 
+
     // Workout routes
     Route::resource('workouts', WorkoutController::class);
 

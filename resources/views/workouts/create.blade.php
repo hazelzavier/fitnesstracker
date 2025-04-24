@@ -14,6 +14,16 @@
             <input type="date" name="date" id="date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
         </div>
 
+    <div>
+    <label for="notes" class="block text-gray-700 text-sm font-bold mb-2">Notes (Optional):</label>
+    <textarea name="notes" id="notes" rows="4" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ old('notes') }}</textarea>
+    @error('notes')
+        <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+    @enderror
+    </div>
+
+
+
         <div id="exercise-fields">
             <div class="exercise-field mt-4 p-4 border rounded-md">
                  <label for="exercise_name" class="block text-gray-700 text-sm font-bold mb-2">Exercise Name:</label>
