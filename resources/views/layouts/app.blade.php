@@ -34,17 +34,20 @@
     </script>
 </head>
 
-<body class="font-sans text-gray-900 bg-white">
+{{-- Verander hier bg-white naar bg-gray-100 dark:bg-gray-900 of verwijder het --}}
+<body class="font-sans text-gray-900 bg-gray-100 dark:bg-gray-900"> {{-- Achtergrond hier instellen --}}
 
     <!-- Main container -->
-    <div class="flex flex-col min-h-screen bg-gray-50">
+    <div class="flex flex-col min-h-screen"> {{-- Verwijder bg-gray-50 hier als je de body al kleurt --}}
 
         <!-- Navigation Bar -->
         @include('layouts.navigation')
 
         <!-- Main Content Area -->
         <main class="flex-grow">
-            <div class="bg-white shadow-md py-8">
+            {{-- Verwijder bg-white hier --}}
+            <div class="shadow-md py-8">
+                {{-- De container kan blijven voor centreren, of verwijder als je full-width wilt --}}
                 <div class="container mx-auto px-6 lg:px-8">
                     @yield('content')
                 </div>
