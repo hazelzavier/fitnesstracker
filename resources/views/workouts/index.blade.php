@@ -8,13 +8,28 @@
 
         
 
-        {{-- Success message (kleuren zijn al ok) --}}
+        {{-- Success message --}}
         @if(session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6" role="alert">
+            {{-- Voeg Alpine.js directives toe --}}
+            <div x-data="{ showSuccessMessage: true }" {{-- Initialiseer state --}}
+                 x-init="setTimeout(() => showSuccessMessage = false, 5000)" {{-- Start timer van 5 seconden --}}
+                 x-show="showSuccessMessage" {{-- Toon/verberg op basis van state --}}
+                 x-transition:leave="transition ease-in duration-300" {{-- Fade out transitie --}}
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6"
+                 role="alert">
+
                 <strong class="font-bold">Success!</strong>
                 <span class="block sm:inline">{{ session('success') }}</span>
+
+                {{-- Optioneel: Voeg een sluitknop toe --}}
+                <button @click="showSuccessMessage = false" class="absolute top-0 bottom-0 right-0 px-4 py-3 text-green-800 hover:text-green-600 dark:text-green-300 dark:hover:text-green-100">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         @endif
+
 
         @if ($workouts->isEmpty())
             {{-- Uitgebreide 'lege staat' kaart MET ACHTERGROND AFBEELDING --}}

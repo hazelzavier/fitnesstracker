@@ -3,20 +3,23 @@
 @section('content')
 {{-- Buitenste container met achtergrondkleur --}}
 <div class="bg-gray-100 dark:bg-gray-900 min-h-screen py-8">
-    {{-- Innerlijke container met max breedte voor betere leesbaarheid --}}
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    {{-- Innerlijke container met max breedte --}}
+    {{-- VOEG showWarningModal TOE AAN x-data --}}
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8" x-data="{ showWarningModal: false }">
 
         <h2 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center sm:text-left">
             Log a New Workout
         </h2>
 
         {{-- Formulier kaart --}}
-        <form method="POST" action="{{ route('workouts.store') }}" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 md:p-8 space-y-6">
+        {{-- Verwijder x-data hier als je het op de parent div hierboven hebt gezet --}}
+        <form method="POST" action="{{ route('workouts.store') }}" class="relative bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 md:p-8 space-y-6">
             @csrf
 
-            {{-- Workout Details Sectie --}}
+            {{-- Workout Details Sectie (blijft hetzelfde) --}}
             <fieldset class="space-y-4">
-                <legend class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 border-b border-gray-200 dark:border-gray-700 pb-1">Workout Details</legend>
+                {{-- ... (legend, naam, datum, notities) ... --}}
+                 <legend class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 border-b border-gray-200 dark:border-gray-700 pb-1">Workout Details</legend>
                 {{-- Naam --}}
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Workout Name:</label>
@@ -43,21 +46,20 @@
                 </div>
             </fieldset>
 
-            {{-- Exercises Sectie --}}
+            {{-- Exercises Sectie (blijft hetzelfde) --}}
             <fieldset class="space-y-4">
-                <legend class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 border-b border-gray-200 dark:border-gray-700 pb-1">Exercises</legend>
-
+                {{-- ... (legend, exercise-fields div, eerste blok) ... --}}
+                 <legend class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 border-b border-gray-200 dark:border-gray-700 pb-1">Exercises</legend>
                 <div id="exercise-fields" class="space-y-6">
-                    {{-- Eerste Oefening Blok (zonder Add/Remove knoppen) --}}
+                    {{-- Eerste Oefening Blok --}}
                     <div class="exercise-field bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-md p-4 space-y-3">
                         <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Exercise #1</p>
-                        {{-- Oefening Naam --}}
+                        {{-- Naam, Weight, Reps, Sets velden blijven hetzelfde --}}
                         <div>
                             <label for="exercise_name_0" class="block text-xs font-medium text-gray-600 dark:text-gray-300">Name:</label>
                             <input type="text" name="exercise_name[]" id="exercise_name_0" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-blue-500 dark:focus:border-blue-600 focus:ring-blue-500 dark:focus:ring-blue-600 rounded-md shadow-sm text-sm" required>
                             @error('exercise_name.0') <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
                         </div>
-                        {{-- Grid voor Weight, Reps, Sets --}}
                         <div class="grid grid-cols-3 gap-3">
                             <div>
                                 <label for="weight_0" class="block text-xs font-medium text-gray-600 dark:text-gray-300">Weight (kg):</label>
@@ -75,12 +77,9 @@
                                 @error('sets.0') <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
                             </div>
                         </div>
-                        {{-- Knoppen hier verwijderd --}}
                     </div>
-                    {{-- Einde Eerste Oefening Blok --}}
                 </div>
-
-                {{-- Knop om extra oefeningen toe te voegen --}}
+                {{-- Knop om extra oefeningen toe te voegen (blijft hetzelfde) --}}
                 <div class="text-right">
                     <button type="button" id="add-exercise-button" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md shadow focus:outline-none focus:shadow-outline text-sm inline-flex items-center">
                         <i class="fas fa-plus mr-1"></i> Add Another Exercise
@@ -88,7 +87,7 @@
                 </div>
             </fieldset>
 
-            {{-- Submit & Cancel Knoppen --}}
+            {{-- Submit & Cancel Knoppen (blijft hetzelfde) --}}
             <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <a href="{{ url()->previous(route('home')) }}" class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
                     Cancel
@@ -98,21 +97,86 @@
                 </button>
             </div>
         </form>
-    </div>
-</div>
+
+        {{-- *** START: Warning Modal *** --}}
+        {{-- Gebruik showWarningModal state variabele --}}
+        <div x-show="showWarningModal"
+             style="display: none;" {{-- Voorkomt FOUC --}}
+             class="fixed inset-0 bg-gray-900 bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center z-50 px-4"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0">
+
+            {{-- Modal Content (gebaseerd op delete modal, maar aangepast) --}}
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md mx-auto"
+                 @click.outside="showWarningModal = false" {{-- Sluit modal bij klikken buiten --}}
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 transform scale-90"
+                 x-transition:enter-end="opacity-100 transform scale-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 transform scale-100"
+                 x-transition:leave-end="opacity-0 transform scale-90">
+
+                {{-- Modal Header --}}
+                <div class="flex justify-between items-center mb-4">
+                    {{-- Titel aangepast --}}
+                    <h3 class="text-xl font-semibold text-yellow-600 dark:text-yellow-400 flex items-center">
+                         <i class="fas fa-exclamation-triangle mr-2"></i> Warning
+                    </h3>
+                    {{-- Sluitknop --}}
+                    <button @click="showWarningModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                {{-- Modal Body --}}
+                <p class="text-gray-600 dark:text-gray-400 mb-6">
+                    You must have at least one exercise listed in your workout.
+                </p>
+
+                {{-- Modal Footer (Alleen OK knop) --}}
+                <div class="flex justify-end space-x-3">
+                    {{-- OK knop die de modal sluit --}}
+                    <button @click="showWarningModal = false"
+                            type="button"
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:shadow-outline transition duration-150 ease-in-out">
+                        OK
+                    </button>
+                    {{-- Tweede knop (Delete) verwijderd --}}
+                </div>
+            </div>
+        </div>
+        {{-- *** EINDE: Warning Modal *** --}}
+
+    </div> {{-- Einde innerlijke container met x-data --}}
+</div> {{-- Einde buitenste container --}}
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const addExerciseButton = document.getElementById('add-exercise-button'); // Target de nieuwe knop ID
+        const addExerciseButton = document.getElementById('add-exercise-button');
         const exerciseFieldsContainer = document.getElementById('exercise-fields');
-        let exerciseCounter = 1; // Start teller voor unieke IDs
+        let exerciseCounter = 1;
+
+        // Functie om de waarschuwingsMODAL te tonen
+        function showWarningModal() {
+            // Vind de root div met x-data
+            const alpineComponentRoot = document.querySelector('div[x-data]');
+            if (alpineComponentRoot && alpineComponentRoot.__x) {
+                 alpineComponentRoot.__x.data.showWarningModal = true;
+            } else {
+                // Fallback naar alert als Alpine niet gevonden wordt
+                console.error("Alpine component not found for warning modal.");
+                alert("You must have at least one exercise.");
+            }
+        }
 
         if (addExerciseButton && exerciseFieldsContainer) {
             addExerciseButton.addEventListener('click', function () {
                 const newExerciseField = document.createElement('div');
-                newExerciseField.className = 'exercise-field bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-md p-4 space-y-3'; // Consistent styling
-
-                // Gebruik teller voor unieke IDs
+                newExerciseField.className = 'exercise-field bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-md p-4 space-y-3';
                 const currentId = exerciseCounter;
 
                 newExerciseField.innerHTML = `
@@ -142,29 +206,35 @@
                     </div>
                 `;
                 exerciseFieldsContainer.appendChild(newExerciseField);
-                exerciseCounter++; // Verhoog teller voor volgende blok
+                exerciseCounter++;
 
-                // Event listener voor de nieuwe remove knop (direct toegevoegd)
+                // Event listener voor de nieuwe remove knop
                 const removeButton = newExerciseField.querySelector('.remove-exercise-field');
                 if(removeButton) {
                     removeButton.addEventListener('click', function () {
-                        newExerciseField.remove();
-                        // Optioneel: Update de # nummers als je wilt
+                        if (exerciseFieldsContainer.children.length > 1) {
+                            newExerciseField.remove();
+                        } else {
+                            // *** GEBRUIK DE NIEUWE MODAL FUNCTIE ***
+                            showWarningModal();
+                        }
                     });
                 }
             });
         }
 
-        // Event listener voor remove knoppen (blijft nodig voor het geval de eerste listener niet pakt)
+        // Event listener voor remove knoppen (delegatie)
         exerciseFieldsContainer.addEventListener('click', function (event) {
-            if (event.target.closest('.remove-exercise-field')) { // Gebruik closest om ook op icoon te reageren
-                const exerciseField = event.target.closest('.exercise-field');
-                if (exerciseField && exerciseFieldsContainer.children.length > 1) { // Verwijder alleen als er meer dan 1 is
-                    exerciseField.remove();
-                    // Optioneel: Update de # nummers als je wilt
-                } else if (exerciseField && exerciseFieldsContainer.children.length === 1) {
-                    // Optioneel: Geef een melding of maak velden leeg ipv verwijderen
-                    alert("You must have at least one exercise.");
+            const removeButton = event.target.closest('.remove-exercise-field');
+            if (removeButton) {
+                const exerciseField = removeButton.closest('.exercise-field');
+                if (exerciseField) {
+                    if (exerciseFieldsContainer.children.length > 1) {
+                        exerciseField.remove();
+                    } else {
+                        // *** GEBRUIK DE NIEUWE MODAL FUNCTIE ***
+                        showWarningModal();
+                    }
                 }
             }
         });
